@@ -80,10 +80,10 @@ variable "sg_rule_settings" {
       source_sg_name = "frontend-alb-sg"
     },
     {
-      sg_name        = "frontend-alb-sg"
-      rule_type      = "ingress"
-      rule_name      = "rule1"
-      cidr_blocks 	 = ["0.0.0.0/0"]
+      sg_name     = "frontend-alb-sg"
+      rule_type   = "ingress"
+      rule_name   = "rule1"
+      cidr_blocks = ["0.0.0.0/0"]
     }
 
   ]
