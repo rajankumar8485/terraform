@@ -58,28 +58,6 @@ variable "ecs_settings" {
   ]
 }
 
-variable "sg_settings" {
-  type = list(any)
-  default = [
-    {
-      service = "frontendecs"
-      sg_name = "frontend-ecs-sg"
-    },
-    {
-      service = "frontendalb"
-      sg_name = "frontend-alb-sg"
-    },
-    {
-      service = "backendecs"
-      sg_name = "backend-ecs-sg"
-    },
-    {
-      service = "backendalb"
-      sg_name = "backend-alb-sg"
-    }
-  ]
-}
-
 variable "sg_rule_settings" {
   type = list(any)
   default = [

@@ -49,8 +49,7 @@ locals {
   ecs_service_settings    = { for key in local.ecs_settings : "${key.resource_unique_id}-service" => key }
   service_subnet_settings = { for key in local.ecs_settings : key.subnet_tier => key }
 
-  sg_settings      = { for key in var.sg_settings : key.sg_name => key }
-  sg_rule_settings = { for key in var.sg_rule_settings : "${key.sg_name}-${rule_name}" => key }
+  sg_rule_settings = { for sg in flatten([for key in var.sg_rule_settings : [for k in key.rules : { sg_name = key.sg_name, key = k }]]) : "${sg.sg_name}-${k.rule_name}" => sg }
 
   target_group_arns = merge({
     for k, v in module.lb : k => v.target_group_arn
@@ -153,12 +152,12 @@ resource "aws_security_group" "this" {
 resource "aws_security_group_rule" "this" {
   for_each = local.sg_rule_settings
 
-  type                     = each.value.rule_type
-  from_port                = lookup(each.value, from_port, 80)
-  to_port                  = lookup(each.value, to_port, 80)
-  protocol                 = lookup(each.value, to_port, "tcp")
-  source_security_group_id = lookup(each.value, "source_sg_name", null) != null ? aws_security_group.this[each.value.source_sg_name].id : null
+  type                     = lookup(each.value.key, "rule_type")
+  from_port                = lookup(each.value.key, "from_port", 80)
+  to_port                  = lookup(each.value.key, "to_port", 80)
+  protocol                 = lookup(each.value.key, "protocol", "tcp")
+  source_security_group_id = lookup(each.value.key, "source_sg_name", null) != null ? aws_security_group.this[each.value.key.source_sg_name].id : null
   security_group_id        = aws_security_group.this[each.value.sg_name].id
-  cidr_blocks              = lookup(each.value, "source_sg_name", null) != null ? lookup(each.value, "cidr_blocks") : null
+  cidr_blocks              = lookup(each.value.key, "source_sg_name", null) != null ? lookup(each.value.key, "cidr_blocks") : null
 
 }
