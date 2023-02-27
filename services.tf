@@ -68,7 +68,7 @@ data "aws_subnets" "this" {
   }
 
   tags = {
-    Tier = key.subnet_tier
+    Tier = each.value.subnet_tier
   }
 
 }
